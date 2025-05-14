@@ -1,10 +1,172 @@
-<form method="POST">
-    {% csrf_token %}
-    <textarea name="user_input" placeholder="Tell me what you're feeling..."></textarea>
-    <button type="submit">Recommend</button>
-  </form>
-  
-  {% if response %}
-    <div><strong>AI Suggestion:</strong> {{ response }}</div>
-  {% endif %}
+{% extends 'recommender/base.html' %}
+
+{% block content %}
+<div class="flex flex-col h-[calc(100vh-8rem)]">
+    <!-- Chat Container -->
+    <div class="flex-1 overflow-y-auto p-4 space-y-4" id="chat-container">
+        <!-- Welcome Message -->
+        <div class="flex items-start space-x-4 animate__animated animate__fadeIn">
+            <div class="flex-shrink-0">
+                <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                    <span class="text-white text-xl">🤖</span>
+                </div>
+            </div>
+            <div class="flex-1 bg-white rounded-lg p-4 shadow-md">
+                <p class="text-gray-800">
+                    Hi! I'm your AI food companion. I can help you find the perfect meal based on your mood, cravings, and preferences. What would you like to eat today?
+                </p>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        {% for message in messages %}
+        <div class="flex items-start space-x-4 {% if message.is_user %}justify-end{% endif %} animate__animated animate__fadeIn">
+            {% if not message.is_user %}
+            <div class="flex-shrink-0">
+                <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                    <span class="text-white text-xl">🤖</span>
+                </div>
+            </div>
+            {% endif %}
+            <div class="flex-1 {% if message.is_user %}order-first{% endif %}">
+                <div class="{% if message.is_user %}bg-blue-500 text-white{% else %}bg-white text-gray-800{% endif %} rounded-lg p-4 shadow-md max-w-2xl">
+                    <p>{{ message.content|linebreaks }}</p>
+                    <span class="text-xs opacity-75 mt-2 block">
+                        {{ message.timestamp|date:"g:i A" }}
+                    </span>
+                </div>
+            </div>
+            {% if message.is_user %}
+            <div class="flex-shrink-0">
+                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
+                    <span class="text-white text-xl">👤</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Input Form -->
+    <div class="border-t bg-white p-4">
+        <form id="chat-form" class="flex space-x-4">
+            <div class="flex-1">
+                <textarea
+                    id="message-input"
+                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                    placeholder="Type your message..."
+                    rows="1"
+                    required
+                ></textarea>
+            </div>
+            <button
+                type="submit"
+                class="bg-gradient-to-r from-green-500 to-blue-500 text-white px-6 py-2 rounded-lg hover:opacity-90 transition duration-300 flex items-center space-x-2"
+            >
+                <span>Send</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                </svg>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Loading Animation -->
+<div id="loading" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-lg shadow-xl text-center">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-500 mx-auto mb-4"></div>
+        <p class="text-gray-700">Thinking about your food preferences...</p>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatContainer = document.getElementById('chat-container');
+    const chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message-input');
+    const loading = document.getElementById('loading');
+
+    // Scroll to bottom of chat
+    function scrollToBottom() {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Add message to chat
+    function addMessage(content, isUser) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `flex items-start space-x-4 ${isUser ? 'justify-end' : ''} animate__animated animate__fadeIn`;
+        
+        const timestamp = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        
+        messageDiv.innerHTML = `
+            ${!isUser ? `
+            <div class="flex-shrink-0">
+                <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                    <span class="text-white text-xl">🤖</span>
+                </div>
+            </div>
+            ` : ''}
+            <div class="flex-1 ${isUser ? 'order-first' : ''}">
+                <div class="${isUser ? 'bg-blue-500 text-white' : 'bg-white text-gray-800'} rounded-lg p-4 shadow-md max-w-2xl">
+                    <p>${content.replace(/\n/g, '<br>')}</p>
+                    <span class="text-xs opacity-75 mt-2 block">${timestamp}</span>
+                </div>
+            </div>
+            ${isUser ? `
+            <div class="flex-shrink-0">
+                <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
+                    <span class="text-white text-xl">👤</span>
+                </div>
+            </div>
+            ` : ''}
+        `;
+        
+        chatContainer.appendChild(messageDiv);
+        scrollToBottom();
+    }
+
+    // Handle form submission
+    chatForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        // Add user message
+        addMessage(message, true);
+        messageInput.value = '';
+        loading.classList.remove('hidden');
+
+        try {
+            const response = await fetch('/send_message/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            const data = await response.json();
+            
+            // Add AI response
+            addMessage(data.response, false);
+        } catch (error) {
+            console.error('Error:', error);
+            addMessage('Sorry, I encountered an error. Please try again.', false);
+        } finally {
+            loading.classList.add('hidden');
+        }
+    });
+
+    // Auto-resize textarea
+    messageInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+
+    // Initial scroll to bottom
+    scrollToBottom();
+});
+</script>
+{% endblock %}
   

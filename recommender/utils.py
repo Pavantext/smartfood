@@ -1,9 +1,9 @@
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-from .models import FoodItem
+from .models import FoodItem, Message
+from django.conf import settings
 import google.generativeai as genai
 import numpy as np
-from django.conf import settings
 import os
 
 # Debug: Print API key status (remove in production)
@@ -14,29 +14,37 @@ if not api_key:
 genai.configure(api_key=api_key)
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
-def get_recommendation(user_input):
-    try:
-        # Debug: Check database state
-        all_foods = FoodItem.objects.all()
-        print(f"Number of food items in database: {all_foods.count()}")
-        
-        if all_foods.count() == 0:
-            # Try to populate the database if empty
-            from django.core.management import call_command
-            call_command('populate_food_items')
-            all_foods = FoodItem.objects.all()
-            print(f"After population - Number of food items: {all_foods.count()}")
+def get_conversation_context(conversation, limit=5):
+    """Get recent conversation history for context"""
+    recent_messages = Message.objects.filter(
+        conversation=conversation
+    ).order_by('-timestamp')[:limit]
+    
+    context = []
+    for msg in reversed(recent_messages):
+        role = "User" if msg.is_user else "Assistant"
+        context.append(f"{role}: {msg.content}")
+    
+    return "\n".join(context)
 
-        # Step 1: Let Gemini extract mood, meal_time, craving
+def get_recommendation(user_input, conversation=None):
+    try:
+        # Get conversation context
+        context = ""
+        if conversation:
+            context = get_conversation_context(conversation)
+            context = f"Previous conversation:\n{context}\n\n"
+
+        # Step 1: Let Gemini analyze the input with context
         gemini = genai.GenerativeModel("gemini-2.0-flash")
-        prompt = f"Extract mood, meal time, and food craving from: '{user_input}'"
+        prompt = f"{context}User's current input: '{user_input}'\n\nExtract mood, meal time, and food craving from this input. Also, consider the conversation history if provided."
         ai_info = gemini.generate_content(prompt).text
 
-        # (Optional) parse AI info using regex or simple logic
-        query = user_input  # or refine it using ai_info
+        # Step 2: Find best food matches
+        query = user_input
         query_vector = embedding_model.encode(query)
 
-        # Step 2: Find best food matches
+        all_foods = FoodItem.objects.all()
         food_vectors = []
         food_names = []
 
@@ -46,17 +54,28 @@ def get_recommendation(user_input):
             food_names.append(food.name)
 
         if not food_vectors:
-            return "Sorry, no food items in the database yet. Please run 'python manage.py populate_food_items' to populate the database."
+            return "I'm still learning about different foods. Could you tell me more about what you're looking for?"
 
         scores = cosine_similarity([query_vector], food_vectors)[0]
-        best_index = int(np.argmax(scores))  # Convert numpy.int64 to Python int
+        best_index = int(np.argmax(scores))
         best_food = all_foods[best_index]
 
-        # Step 3: Let Gemini generate a nice response
-        response = gemini.generate_content(
-            f"User is feeling: {ai_info}. Recommend the food: {best_food.name} in a friendly tone."
-        ).text
+        # Step 3: Generate a conversational response
+        response_prompt = f"""
+        Context: {context}
+        User's current input: {user_input}
+        Analysis: {ai_info}
+        Recommended food: {best_food.name}
+        
+        Generate a friendly, conversational response that:
+        1. Acknowledges the user's input
+        2. Mentions the recommended food naturally
+        3. Includes some details about the food
+        4. Asks a follow-up question to keep the conversation going
+        """
 
+        response = gemini.generate_content(response_prompt).text
         return response
+
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"I'm having trouble understanding right now. Could you rephrase that? (Error: {str(e)})"
