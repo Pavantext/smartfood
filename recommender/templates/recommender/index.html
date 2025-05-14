@@ -1,0 +1,10 @@
+<form method="POST">
+    {% csrf_token %}
+    <textarea name="user_input" placeholder="Tell me what you're feeling..."></textarea>
+    <button type="submit">Recommend</button>
+  </form>
+  
+  {% if response %}
+    <div><strong>AI Suggestion:</strong> {{ response }}</div>
+  {% endif %}
+  

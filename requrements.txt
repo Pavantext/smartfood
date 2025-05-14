@@ -1,0 +1,6 @@
+sentence_transformers
+google-generativeai
+python-dotenv
+scikit-learn
+numpy
+django
