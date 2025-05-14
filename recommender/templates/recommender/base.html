@@ -3,53 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartFood - AI Food Recommendations</title>
+    <title>SmartFood AI</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <!-- Custom CSS -->
     <style>
-        .gradient-bg {
-            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+        :root {
+            --primary-color: #ff5252;
         }
-        .food-card {
+        
+        body {
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+            min-height: 100vh;
+        }
+
+        .bg-white {
+            background-color: blanchedalmond !important;
+        }
+
+        .gradient-text {
+            background: var(--primary-color);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-bg {
+            background: var(--primary-color);
+        }
+
+        .hover-scale {
             transition: transform 0.3s ease;
         }
-        .food-card:hover {
-            transform: translateY(-5px);
+
+        .hover-scale:hover {
+            transform: scale(1.02);
         }
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
+
         .typing-animation {
-            overflow: hidden;
-            border-right: 2px solid #000;
-            white-space: nowrap;
+            border-right: 2px solid var(--primary-color);
             animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
         }
+
         @keyframes typing {
             from { width: 0 }
             to { width: 100% }
         }
+
         @keyframes blink-caret {
             from, to { border-color: transparent }
-            50% { border-color: #000 }
+            50% { border-color: var(--primary-color) }
+        }
+
+        .chat-bubble {
+            position: relative;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .chat-bubble:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .chat-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 20px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid var(--primary-color);
+        }
+
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(255, 82, 82, 0.2);
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="font-sans">
     <!-- Navigation -->
     <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <span class="text-2xl font-bold text-green-600">SmartFood</span>
+                    <span class="text-2xl font-bold gradient-text">SmartFood AI</span>
                 </div>
                 <div class="flex items-center space-x-4">
                     <a href="/" class="text-gray-700 hover:text-green-600 transition">Home</a>
@@ -60,15 +109,15 @@
     </nav>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 py-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {% block content %}
         {% endblock %}
     </main>
 
     <!-- Footer -->
     <footer class="bg-white shadow-lg mt-8">
-        <div class="max-w-7xl mx-auto px-4 py-6">
-            <p class="text-center text-gray-600">© 2024 SmartFood. All rights reserved.</p>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <p class="text-center text-gray-600">© 2024 SmartFood AI. All rights reserved.</p>
         </div>
     </footer>
 
