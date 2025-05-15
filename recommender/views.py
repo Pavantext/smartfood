@@ -25,6 +25,26 @@ def index(request):
     })
 
 @csrf_exempt
+def clear_session(request):
+    if request.method == 'POST':
+        # Clear the session
+        if 'conversation_id' in request.session:
+            # Delete all messages for the current conversation
+            conversation = get_or_create_conversation(request)
+            conversation.messages.all().delete()
+            
+            # Generate a new session ID
+            new_session_id = str(uuid.uuid4())
+            request.session['conversation_id'] = new_session_id
+            
+            # Create a new conversation
+            Conversation.objects.create(session_id=new_session_id)
+            
+            return JsonResponse({'status': 'success'})
+    
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@csrf_exempt
 def send_message(request):
     if request.method == 'POST':
         data = json.loads(request.body)

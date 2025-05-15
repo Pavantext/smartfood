@@ -90,6 +90,37 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageInput = document.getElementById('message-input');
     const loading = document.getElementById('loading');
 
+    // Function to clear chat history and start new session
+    async function startNewSession() {
+        try {
+            // Clear the chat container except for the welcome message
+            const welcomeMessage = chatContainer.firstElementChild;
+            chatContainer.innerHTML = '';
+            chatContainer.appendChild(welcomeMessage);
+
+            // Make request to clear session on server
+            await fetch('/clear_session/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            // Animate the welcome message
+            gsap.from(welcomeMessage, {
+                duration: 0.5,
+                y: 20,
+                opacity: 0,
+                ease: "power2.out"
+            });
+        } catch (error) {
+            console.error('Error starting new session:', error);
+        }
+    }
+
+    // Start new session when page loads
+    startNewSession();
+
     // Scroll to bottom of chat with smooth animation
     function scrollToBottom() {
         chatContainer.scrollTo({
