@@ -6,12 +6,13 @@ import google.generativeai as genai
 import numpy as np
 import os
 
-# Debug: Print API key status (remove in production)
+# Configure Gemini API
 api_key = settings.GEMINI_API_KEY
 if not api_key:
     raise ValueError("GEMINI_API_KEY not found in environment variables. Please check your .env file.")
-
 genai.configure(api_key=api_key)
+
+# Load embedding model
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 
 def get_conversation_context(conversation, limit=5):
@@ -29,67 +30,81 @@ def get_conversation_context(conversation, limit=5):
 
 def get_recommendation(user_input, conversation=None):
     try:
-        # Get conversation context
-        context = ""
-        if conversation:
-            context = get_conversation_context(conversation)
-            context = f"Previous conversation:\n{context}\n\n"
+        # Context history
+        context = get_conversation_context(conversation) if conversation else ""
+        context_block = f"Previous conversation:\n{context}\n\n" if context else ""
 
-        # Step 1: Let Gemini analyze the input with context
-        gemini = genai.GenerativeModel("gemini-2.0-flash")
-        food_items = FoodItem.objects.all()
-        food_list = ""
+        # Prepare food item descriptions
+        food_items = list(FoodItem.objects.all())
+        if not food_items:
+            return "I don't have any food options yet to recommend. Please add some to the menu first."
+
+        food_descriptions = []
         for idx, food in enumerate(food_items, 1):
-            food_list += f"{idx}. {food.name}: {food.ingredients}. {food.description if hasattr(food, 'description') else ''}\n"
+            desc = (
+                f"{idx}. {food.name} - Ingredients: {food.ingredients}. "
+                f"Meal time: {food.meal_time}. Mood tags: {food.mood_tags}. "
+                f"{food.description if hasattr(food, 'description') else ''}"
+            )
+            food_descriptions.append(desc)
 
+        food_list_str = "\n".join(food_descriptions)
+
+        # Gemini: Analyze the input and suggest the best food (semantic reasoning)
+        gemini = genai.GenerativeModel("gemini-2.0-flash")
         prompt = f"""
-        You are an expert food recommender. Here is a list of food and drink items:
+        You are a smart and friendly food assistant.
 
-        {food_list}
+        {context_block}
+        Here is a list of available food items:
+        {food_list_str}
 
         The user says: "{user_input}"
 
-        Based on the food and drink names and descriptions, recommend the most suitable item for the user. Consider the weather, the user's desire for a warm drink, and any other relevant context. Explain your choice in a friendly, conversational way.
+        Based on the available foods and user's input, recommend the single most suitable item.
+        Consider:
+        - Weather context (e.g., hot/cold)
+        - Drink or food preference
+        - Mood
+        - Meal time (e.g., breakfast, lunch)
+        - Ingredients or cravings
+
+        Respond with:
+        1. Food Name
+        2. Reason for recommendation
+        3. A friendly sentence to suggest it
         """
 
-        ai_info = gemini.generate_content(prompt).text
+        gemini_response = gemini.generate_content(prompt).text.strip()
 
-        # Step 2: Find best food matches
-        query = user_input
-        query_vector = embedding_model.encode(query)
-
-        all_foods = FoodItem.objects.all()
+        # Embedding-based similarity search
+        query_vector = embedding_model.encode(user_input)
         food_vectors = []
-        food_names = []
-
-        for food in all_foods:
-            description = f"{food.name} with {food.ingredients} for {food.meal_time} - {food.mood_tags}"
-            food_vectors.append(embedding_model.encode(description))
-            food_names.append(food.name)
-
-        if not food_vectors:
-            return "I'm still learning about different foods. Could you tell me more about what you're looking for?"
+        for food in food_items:
+            vector_text = f"{food.name}, {food.ingredients}, {food.description}, {food.meal_time}, {food.mood_tags}"
+            food_vectors.append(embedding_model.encode(vector_text))
+        food_vectors = np.array(food_vectors)
 
         scores = cosine_similarity([query_vector], food_vectors)[0]
         best_index = int(np.argmax(scores))
-        best_food = all_foods[best_index]
+        best_food = food_items[best_index]
 
-        # Step 3: Generate a conversational response
-        response_prompt = f"""
-        Context: {context}
-        User's current input: {user_input}
-        Analysis: {ai_info}
-        Recommended food: {best_food.name}
-        
-        Generate a friendly, conversational response that:
-        1. Acknowledges the user's input
-        2. Mentions the recommended food naturally
-        3. Includes some details about the food
-        4. Asks a follow-up question to keep the conversation going
+        # Final friendly response
+        final_prompt = f"""
+        {context_block}
+        User's input: "{user_input}"
+        Gemini's recommendation: {gemini_response}
+        Best semantic match based on user input: {best_food.name} - {best_food.description}
+
+        Write a single, friendly, natural-sounding response that:
+        - Acknowledges the user's input
+        - Explains the food choice clearly
+        - Includes one or two ingredients or features
+        - Asks a question or offers to suggest another item
         """
 
-        response = gemini.generate_content(response_prompt).text
-        return response
+        final_response = gemini.generate_content(final_prompt).text.strip()
+        return final_response
 
     except Exception as e:
-        return f"I'm having trouble understanding right now. Could you rephrase that? (Error: {str(e)})"
+        return f"I'm having trouble figuring that out right now. Could you rephrase? (Error: {str(e)})"

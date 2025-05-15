@@ -6,7 +6,8 @@ class FoodItem(models.Model):
     ingredients = models.TextField()
     region = models.CharField(max_length=50)
     meal_time = models.CharField(max_length=50)
-    mood_tags = models.CharField(max_length=255)  # comma-separated
+    mood_tags = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
 
     def __str__(self):
         return self.name
