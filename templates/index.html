@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Food Recommender</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            padding: 2rem;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #4a90e2, #5cb3ff);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+        .recommendation-card {
+            margin-top: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        .food-item {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 10px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        .food-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        .food-item:nth-child(1) { animation-delay: 0.1s; }
+        .food-item:nth-child(2) { animation-delay: 0.2s; }
+        .food-item:nth-child(3) { animation-delay: 0.3s; }
+        .food-item:nth-child(4) { animation-delay: 0.4s; }
+        .food-item:nth-child(5) { animation-delay: 0.5s; }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4a90e2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="header animate__animated animate__fadeIn">
+            <h1>Smart Food Recommender</h1>
+            <p>Get personalized food recommendations based on your preferences</p>
+        </div>
+        
+        <div class="card animate__animated animate__fadeInUp">
+            <div class="card-body">
+                <form method="post" id="recommendationForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="preferences" class="form-label">What kind of food are you looking for?</label>
+                        <textarea class="form-control" id="preferences" name="preferences" rows="3" 
+                                placeholder="Example: I want something healthy and light for lunch..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Get Recommendations</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <p class="mt-2">Finding the perfect food for you...</p>
+        </div>
+
+        {% if recommendations %}
+        <div class="card recommendation-card">
+            <div class="card-body">
+                <h5 class="card-title">Recommended Foods</h5>
+                {% for food in recommendations %}
+                <div class="food-item animate__animated animate__fadeInRight">
+                    <h6 class="mb-1">{{ food.name }}</h6>
+                    <p class="mb-0 text-muted">{{ food.description }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('recommendationForm').addEventListener('submit', function() {
+            document.querySelector('.loading').style.display = 'block';
+        });
+    </script>
+</body>
+</html> 

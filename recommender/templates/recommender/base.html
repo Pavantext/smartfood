@@ -8,101 +8,154 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- GSAP for advanced animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <!-- Custom CSS -->
     <style>
         :root {
             --primary-color: #ff5252;
+            --secondary-color: #4CAF50;
+            --gradient-start: #ff5252;
+            --gradient-end: #ff8a80;
         }
         
         body {
             background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
             min-height: 100vh;
+            font-family: 'Inter', sans-serif;
         }
 
         .bg-white {
-            background-color: blanchedalmond !important;
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
         }
 
         .gradient-text {
-            background: var(--primary-color);
+            background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .gradient-bg {
-            background: var(--primary-color);
+            background: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
         }
 
         .hover-scale {
-            transition: transform 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .hover-scale:hover {
-            transform: scale(1.02);
-        }
-
-        .typing-animation {
-            border-right: 2px solid var(--primary-color);
-            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
-        }
-
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
-        }
-
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: var(--primary-color) }
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
         .chat-bubble {
             position: relative;
-            border-radius: 1rem;
-            padding: 1rem;
+            border-radius: 1.5rem;
+            padding: 1.25rem;
             margin: 1rem 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: bubbleAppear 0.5s ease-out;
+        }
+
+        @keyframes bubbleAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .chat-bubble:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
 
         .chat-bubble::before {
             content: '';
             position: absolute;
-            bottom: -8px;
+            bottom: -10px;
             left: 20px;
             width: 0;
             height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 8px solid var(--primary-color);
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid var(--primary-color);
+            transition: all 0.3s ease;
         }
 
         .input-focus {
             transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
 
         .input-focus:focus {
             box-shadow: 0 0 0 3px rgba(255, 82, 82, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .loading-dots {
+            display: inline-block;
+        }
+
+        .loading-dots::after {
+            content: '...';
+            animation: loadingDots 1.5s infinite;
+        }
+
+        @keyframes loadingDots {
+            0% { content: '.'; }
+            33% { content: '..'; }
+            66% { content: '...'; }
+        }
+
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
         }
     </style>
 </head>
 <body class="font-sans">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <span class="text-2xl font-bold gradient-text">SmartFood AI</span>
+                    <span class="text-2xl font-bold gradient-text animate__animated animate__fadeIn">SmartFood AI</span>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <a href="/" class="text-gray-700 hover:text-green-600 transition">Home</a>
-                    <a href="#" class="text-gray-700 hover:text-green-600 transition">About</a>
+                <div class="flex items-center space-x-6">
+                    <a href="/" class="nav-link text-gray-700 hover:text-green-600 transition">Home</a>
+                    <a href="#" class="nav-link text-gray-700 hover:text-green-600 transition">About</a>
                 </div>
             </div>
         </div>
@@ -117,7 +170,7 @@
     <!-- Footer -->
     <footer class="bg-white shadow-lg mt-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <p class="text-center text-gray-600">© 2024 SmartFood AI. All rights reserved.</p>
+            <p class="text-center text-gray-600 animate__animated animate__fadeIn">© 2024 SmartFood AI. All rights reserved.</p>
         </div>
     </footer>
 

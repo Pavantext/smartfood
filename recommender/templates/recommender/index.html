@@ -5,14 +5,14 @@
     <!-- Chat Container -->
     <div class="flex-1 overflow-y-auto p-4 space-y-4" id="chat-container">
         <!-- Welcome Message -->
-        <div class="flex items-start space-x-4 animate__animated animate__fadeIn">
+        <div class="flex items-start space-x-4 animate__animated animate__fadeInUp">
             <div class="flex-shrink-0">
-                <div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
-                    <span class="text-white text-xl">🤖</span>
+                <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center floating">
+                    <span class="text-white text-2xl">🤖</span>
                 </div>
             </div>
-            <div class="flex-1 bg-white rounded-lg p-4 shadow-md chat-bubble">
-                <p class="text-gray-800">
+            <div class="flex-1 bg-white rounded-lg p-6 shadow-md chat-bubble">
+                <p class="text-gray-800 text-lg">
                     Hi! I'm your AI food companion. I can help you find the perfect meal based on your mood, cravings, and preferences. What would you like to eat today?
                 </p>
             </div>
@@ -20,17 +20,17 @@
 
         <!-- Chat Messages -->
         {% for message in messages %}
-        <div class="flex items-start space-x-4 {% if message.is_user %}justify-end{% endif %} animate__animated animate__fadeIn">
+        <div class="flex items-start space-x-4 {% if message.is_user %}justify-end{% endif %} animate__animated animate__fadeInUp">
             {% if not message.is_user %}
             <div class="flex-shrink-0">
-                <div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
-                    <span class="text-white text-xl">🤖</span>
+                <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center floating">
+                    <span class="text-white text-2xl">🤖</span>
                 </div>
             </div>
             {% endif %}
             <div class="flex-1 {% if message.is_user %}order-first{% endif %}">
-                <div class="{% if message.is_user %}gradient-bg text-white{% else %}bg-white text-gray-800{% endif %} rounded-lg p-4 shadow-md max-w-2xl chat-bubble">
-                    <p>{{ message.content|linebreaks }}</p>
+                <div class="{% if message.is_user %}gradient-bg text-white{% else %}bg-white text-gray-800{% endif %} rounded-lg p-6 shadow-md max-w-2xl chat-bubble">
+                    <p class="text-lg">{{ message.content|linebreaks }}</p>
                     <span class="text-xs opacity-75 mt-2 block">
                         {{ message.timestamp|date:"g:i A" }}
                     </span>
@@ -38,8 +38,8 @@
             </div>
             {% if message.is_user %}
             <div class="flex-shrink-0">
-                <div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
-                    <span class="text-white text-xl">👤</span>
+                <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center floating">
+                    <span class="text-white text-2xl">👤</span>
                 </div>
             </div>
             {% endif %}
@@ -48,12 +48,12 @@
     </div>
 
     <!-- Input Form -->
-    <div class="border-t bg-white p-4">
+    <div class="border-t bg-white p-4 shadow-lg">
         <form id="chat-form" class="flex space-x-4">
             <div class="flex-1">
                 <textarea
                     id="message-input"
-                    class="w-full px-4 py-2 border rounded-lg focus:outline-none input-focus resize-none"
+                    class="w-full px-6 py-3 border-2 rounded-xl focus:outline-none input-focus resize-none text-lg"
                     placeholder="Type your message..."
                     rows="1"
                     required
@@ -61,10 +61,10 @@
             </div>
             <button
                 type="submit"
-                class="gradient-bg text-white px-6 py-2 rounded-lg hover:opacity-90 transition duration-300 flex items-center space-x-2 hover-scale"
+                class="gradient-bg text-white px-8 py-3 rounded-xl hover:opacity-90 transition duration-300 flex items-center space-x-2 hover-scale"
             >
-                <span>Send</span>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span class="text-lg">Send</span>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                 </svg>
             </button>
@@ -73,10 +73,13 @@
 </div>
 
 <!-- Loading Animation -->
-<div id="loading" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white p-8 rounded-lg shadow-xl text-center">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#ff5252] mx-auto mb-4"></div>
-        <p class="text-gray-700">Thinking about your food preferences...</p>
+<div id="loading" class="hidden fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-xl shadow-2xl text-center animate__animated animate__fadeIn">
+        <div class="relative w-20 h-20 mx-auto mb-4">
+            <div class="absolute inset-0 rounded-full border-4 border-gray-200"></div>
+            <div class="absolute inset-0 rounded-full border-4 border-t-[#ff5252] animate-spin"></div>
+        </div>
+        <p class="text-gray-700 text-lg">Thinking about your food preferences<span class="loading-dots"></span></p>
     </div>
 </div>
 
@@ -87,46 +90,58 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageInput = document.getElementById('message-input');
     const loading = document.getElementById('loading');
 
-    // Scroll to bottom of chat
+    // Scroll to bottom of chat with smooth animation
     function scrollToBottom() {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        chatContainer.scrollTo({
+            top: chatContainer.scrollHeight,
+            behavior: 'smooth'
+        });
     }
 
-    // Add message to chat
+    // Add message to chat with GSAP animation
     function addMessage(content, isUser) {
         const messageDiv = document.createElement('div');
-        messageDiv.className = `flex items-start space-x-4 ${isUser ? 'justify-end' : ''} animate__animated animate__fadeIn`;
+        messageDiv.className = `flex items-start space-x-4 ${isUser ? 'justify-end' : ''} animate__animated animate__fadeInUp`;
         
         const timestamp = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
         
         messageDiv.innerHTML = `
             ${!isUser ? `
             <div class="flex-shrink-0">
-                <div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
-                    <span class="text-white text-xl">🤖</span>
+                <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center floating">
+                    <span class="text-white text-2xl">🤖</span>
                 </div>
             </div>
             ` : ''}
             <div class="flex-1 ${isUser ? 'order-first' : ''}">
-                <div class="${isUser ? 'gradient-bg text-white' : 'bg-white text-gray-800'} rounded-lg p-4 shadow-md max-w-2xl chat-bubble">
-                    <p>${content.replace(/\n/g, '<br>')}</p>
+                <div class="${isUser ? 'gradient-bg text-white' : 'bg-white text-gray-800'} rounded-lg p-6 shadow-md max-w-2xl chat-bubble">
+                    <p class="text-lg">${content.replace(/\n/g, '<br>')}</p>
                     <span class="text-xs opacity-75 mt-2 block">${timestamp}</span>
                 </div>
             </div>
             ${isUser ? `
             <div class="flex-shrink-0">
-                <div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
-                    <span class="text-white text-xl">👤</span>
+                <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center floating">
+                    <span class="text-white text-2xl">👤</span>
                 </div>
             </div>
             ` : ''}
         `;
         
         chatContainer.appendChild(messageDiv);
+        
+        // Animate the new message with GSAP
+        gsap.from(messageDiv, {
+            duration: 0.5,
+            y: 20,
+            opacity: 0,
+            ease: "power2.out"
+        });
+        
         scrollToBottom();
     }
 
-    // Handle form submission
+    // Handle form submission with enhanced animations
     chatForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         const message = messageInput.value.trim();
@@ -135,7 +150,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add user message
         addMessage(message, true);
         messageInput.value = '';
-        loading.classList.remove('hidden');
+        
+        // Show loading animation with fade
+        gsap.to(loading, {
+            duration: 0.3,
+            opacity: 1,
+            display: "flex",
+            ease: "power2.inOut"
+        });
 
         try {
             const response = await fetch('/send_message/', {
@@ -154,14 +176,24 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
             addMessage('Sorry, I encountered an error. Please try again.', false);
         } finally {
-            loading.classList.add('hidden');
+            // Hide loading animation with fade
+            gsap.to(loading, {
+                duration: 0.3,
+                opacity: 0,
+                display: "none",
+                ease: "power2.inOut"
+            });
         }
     });
 
-    // Auto-resize textarea
+    // Auto-resize textarea with smooth animation
     messageInput.addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = (this.scrollHeight) + 'px';
+        gsap.to(this, {
+            duration: 0.2,
+            height: 'auto',
+            scrollHeight: this.scrollHeight,
+            ease: "power2.out"
+        });
     });
 
     // Allow Enter to submit, Shift+Enter for newline
