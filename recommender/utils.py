@@ -37,7 +37,21 @@ def get_recommendation(user_input, conversation=None):
 
         # Step 1: Let Gemini analyze the input with context
         gemini = genai.GenerativeModel("gemini-2.0-flash")
-        prompt = f"{context}User's current input: '{user_input}'\n\nExtract mood, meal time, and food craving from this input. Also, consider the conversation history if provided."
+        food_items = FoodItem.objects.all()
+        food_list = ""
+        for idx, food in enumerate(food_items, 1):
+            food_list += f"{idx}. {food.name}: {food.ingredients}. {food.description if hasattr(food, 'description') else ''}\n"
+
+        prompt = f"""
+        You are an expert food recommender. Here is a list of food and drink items:
+
+        {food_list}
+
+        The user says: "{user_input}"
+
+        Based on the food and drink names and descriptions, recommend the most suitable item for the user. Consider the weather, the user's desire for a warm drink, and any other relevant context. Explain your choice in a friendly, conversational way.
+        """
+
         ai_info = gemini.generate_content(prompt).text
 
         # Step 2: Find best food matches

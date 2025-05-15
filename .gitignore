@@ -7,7 +7,7 @@ __pycache__/
 *.so
 
 
-__pycache__/
+__pycache__
 *.pyc
 *.pyo
 *.pyd
@@ -16,7 +16,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-env/
+.env
 build/
 develop-eggs/
 dist/
