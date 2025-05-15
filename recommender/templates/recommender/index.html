@@ -164,6 +164,14 @@ document.addEventListener('DOMContentLoaded', function() {
         this.style.height = (this.scrollHeight) + 'px';
     });
 
+    // Allow Enter to submit, Shift+Enter for newline
+    messageInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            chatForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+        }
+    });
+
     // Initial scroll to bottom
     scrollToBottom();
 });
