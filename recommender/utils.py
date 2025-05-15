@@ -53,27 +53,46 @@ def get_recommendation(user_input, conversation=None):
         # Gemini: Analyze the input and suggest the best food (semantic reasoning)
         gemini = genai.GenerativeModel("gemini-2.0-flash")
         prompt = f"""
-        You are a smart and friendly food assistant.
+You are a smart, friendly, and highly intuitive food assistant designed to give personalized dish recommendations.
 
-        {context_block}
-        Here is a list of available food items:
-        {food_list_str}
+You will be provided with:
+1. A list of available food items in JSON format.
+2. The user's input, which may include preferences, mood, cravings, time of day, or even weather conditions.
 
-        The user says: "{user_input}"
+Each food item includes:
+- Name
+- Ingredients
+- Region
+- Meal time (e.g., Breakfast, Lunch, Dinner, Starter)
+- Mood tags (e.g., comforting, spicy, refreshing)
+- Description
 
-        Based on the available foods and user's input, recommend the single most suitable item.
-        Consider:
-        - Weather context (e.g., hot/cold)
-        - Drink or food preference
-        - Mood
-        - Meal time (e.g., breakfast, lunch)
-        - Ingredients or cravings
+### Your task:
+Analyze the user's input carefully and match it to **one** most appropriate food item from the list.
 
-        Respond with:
-        1. Food Name
-        2. Reason for recommendation
-        3. A friendly sentence to suggest it
-        """
+Consider the following when making a recommendation:
+- Current weather or temperature context (e.g., hot/cold day)
+- Whether the user wants a drink or food
+- The user’s mood or emotional state (e.g., happy, tired, sad)
+- Cravings or ingredient mentions (e.g., "I want something spicy")
+- Time of day (e.g., lunch, dinner, snack)
+- Regional preference if mentioned
+
+### Output Format:
+Respond in the following format:
+1. **Food Name**: <name>
+2. **Reason**: Explain why this food is the best match based on user input and food details.
+3. **Suggestion**: A friendly and engaging sentence suggesting the dish (as if you’re talking to the user directly).
+
+### Available Food Items:
+{food_list_str}
+
+### User Input:
+"{user_input}"
+
+Your response:
+"""
+
 
         gemini_response = gemini.generate_content(prompt).text.strip()
 
