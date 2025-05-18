@@ -51,7 +51,7 @@ def get_recommendation(user_input, conversation=None):
         food_list_str = "\n".join(food_descriptions)
 
         # Gemini: Analyze the input and suggest the best food (semantic reasoning)
-        gemini = genai.GenerativeModel("gemini-2.0-flash")
+        gemini = genai.GenerativeModel(model_name="tunedModels/south-indian-food-bot-8901")
         prompt = f"""
 You are a smart, friendly, and highly intuitive food assistant designed to give personalized dish recommendations.
 
@@ -73,7 +73,7 @@ Analyze the user's input carefully and match it to **one** most appropriate food
 Consider the following when making a recommendation:
 - Current weather or temperature context (e.g., hot/cold day)
 - Whether the user wants a drink or food
-- The user’s mood or emotional state (e.g., happy, tired, sad)
+- The user's mood or emotional state (e.g., happy, tired, sad)
 - Cravings or ingredient mentions (e.g., "I want something spicy")
 - Time of day (e.g., lunch, dinner, snack)
 - Regional preference if mentioned
@@ -82,7 +82,7 @@ Consider the following when making a recommendation:
 Respond in the following format:
 1. **Food Name**: <name>
 2. **Reason**: Explain why this food is the best match based on user input and food details.
-3. **Suggestion**: A friendly and engaging sentence suggesting the dish (as if you’re talking to the user directly).
+3. **Suggestion**: A friendly and engaging sentence suggesting the dish (as if you're talking to the user directly).
 
 ### Available Food Items:
 {food_list_str}
