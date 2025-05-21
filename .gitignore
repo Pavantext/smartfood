@@ -5,6 +5,12 @@ __pycache__/
 
 # C extensions
 *.so
+*.pyc
+__pycache__/
+.env
+db.sqlite3
+staticfiles/
+venv/
 
 
 __pycache__
