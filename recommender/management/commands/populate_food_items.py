@@ -47,6 +47,70 @@ class Command(BaseCommand):
                 'mood_tags': 'comforting, mild, traditional, filling',
                 'description': 'A creamy, mildly spiced rice and lentil dish cooked with ghee, black pepper, and cashews. Served hot, it is a comforting breakfast especially during festivals or winter.'
             },
+            {
+                'name': 'Sambar Rice',
+                'ingredients': 'Rice, toor dal, vegetables, sambar powder, tamarind',
+                'region': 'South Indian',
+                'meal_time': 'Lunch',
+                'mood_tags': 'comforting, wholesome, traditional, filling',
+                'description': 'A classic combination of steamed rice mixed with flavorful sambar, made with lentils, vegetables, and aromatic spices. A complete meal that embodies South Indian home cooking.'
+            },
+            {
+                'name': 'Rasam',
+                'ingredients': 'Tamarind, tomatoes, lentils, rasam powder, curry leaves',
+                'region': 'South Indian',
+                'meal_time': 'Dinner',
+                'mood_tags': 'light, soothing, digestive, warming',
+                'description': 'A tangy and aromatic soup made with tamarind, tomatoes, and spices. Often served with rice or consumed as a digestive drink, perfect for cold evenings or when feeling under the weather.'
+            },
+            {
+                'name': 'Upma',
+                'ingredients': 'Semolina, vegetables, mustard seeds, curry leaves',
+                'region': 'South Indian',
+                'meal_time': 'Breakfast',
+                'mood_tags': 'light, healthy, quick, comforting',
+                'description': 'A savory porridge made from roasted semolina, tempered with mustard seeds and curry leaves. Often packed with vegetables, it is a popular quick breakfast option.'
+            },
+            {
+                'name': 'Uttapam',
+                'ingredients': 'Fermented rice batter, onions, tomatoes, green chilies',
+                'region': 'South Indian',
+                'meal_time': 'Breakfast',
+                'mood_tags': 'soft, savory, fermented, healthy',
+                'description': 'A thick pancake made from fermented rice batter, topped with vegetables. Softer than dosa with a slight tanginess from fermentation, often served with chutney.'
+            },
+            {
+                'name': 'Avial',
+                'ingredients': 'Mixed vegetables, coconut, yogurt, curry leaves',
+                'region': 'South Indian',
+                'meal_time': 'Lunch',
+                'mood_tags': 'nutritious, traditional, festival, coconutty',
+                'description': 'A thick vegetable curry made with coconut paste and yogurt, seasoned with coconut oil. A staple in Kerala sadhya (festive meals), celebrating local produce.'
+            },
+            {
+                'name': 'Kerala Fish Curry',
+                'ingredients': 'Fish, coconut milk, kokum, shallots, spices',
+                'region': 'South Indian',
+                'meal_time': 'Dinner',
+                'mood_tags': 'tangy, coconut-based, coastal, aromatic',
+                'description': 'A signature Malabar coast dish where fish is simmered in a coconut milk gravy with kokum and spices. Best enjoyed with steamed red rice or appam.'
+            },
+            {
+                'name': 'Bisibele Bath',
+                'ingredients': 'Rice, lentils, vegetables, bisibele bath powder, ghee',
+                'region': 'South Indian',
+                'meal_time': 'Lunch',
+                'mood_tags': 'spicy, flavorful, one-pot-meal, festival',
+                'description': 'A hearty Karnataka specialty combining rice, lentils, and vegetables in a spicy masala paste. Traditionally served with potato chips and boondi.'
+            },
+            {
+                'name': 'Appam with Stew',
+                'ingredients': 'Fermented rice batter, coconut milk, vegetables, coconut oil',
+                'region': 'South Indian',
+                'meal_time': 'Dinner',
+                'mood_tags': 'soft, lacy, coconutty, comforting',
+                'description': 'Lacy rice hoppers with crispy edges and soft center, paired with a mild vegetable or chicken stew in coconut milk. A Kerala favorite for Sunday breakfasts.'
+            },
 
             # North Indian
             {
