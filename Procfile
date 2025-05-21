@@ -1,1 +1,1 @@
-web: gunicorn smartfood.wsgi:application 
+web: gunicorn smartfood.wsgi:application
