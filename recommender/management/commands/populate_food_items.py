@@ -79,14 +79,7 @@ class Command(BaseCommand):
                 'mood_tags': 'soft, savory, fermented, healthy',
                 'description': 'A thick pancake made from fermented rice batter, topped with vegetables. Softer than dosa with a slight tanginess from fermentation, often served with chutney.'
             },
-            {
-                'name': 'Avial',
-                'ingredients': 'Mixed vegetables, coconut, yogurt, curry leaves',
-                'region': 'South Indian',
-                'meal_time': 'Lunch',
-                'mood_tags': 'nutritious, traditional, festival, coconutty',
-                'description': 'A thick vegetable curry made with coconut paste and yogurt, seasoned with coconut oil. A staple in Kerala sadhya (festive meals), celebrating local produce.'
-            },
+          
             {
                 'name': 'Kerala Fish Curry',
                 'ingredients': 'Fish, coconut milk, kokum, shallots, spices',
@@ -103,14 +96,7 @@ class Command(BaseCommand):
                 'mood_tags': 'spicy, flavorful, one-pot-meal, festival',
                 'description': 'A hearty Karnataka specialty combining rice, lentils, and vegetables in a spicy masala paste. Traditionally served with potato chips and boondi.'
             },
-            {
-                'name': 'Appam with Stew',
-                'ingredients': 'Fermented rice batter, coconut milk, vegetables, coconut oil',
-                'region': 'South Indian',
-                'meal_time': 'Dinner',
-                'mood_tags': 'soft, lacy, coconutty, comforting',
-                'description': 'Lacy rice hoppers with crispy edges and soft center, paired with a mild vegetable or chicken stew in coconut milk. A Kerala favorite for Sunday breakfasts.'
-            },
+            
 
             # North Indian
             {
@@ -129,14 +115,7 @@ class Command(BaseCommand):
                 'mood_tags': 'filling, spicy, traditional, energizing',
                 'description': 'A spicy, filling dish of chickpeas cooked with a blend of spices, served with a soft, fluffy bread called bhatura. A popular breakfast or snack in North India.'
             },
-            {
-                'name': 'Rogan Josh',
-                'ingredients': 'Lamb, yogurt, spices, onions, tomatoes',
-                'region': 'North Indian',
-                'meal_time': 'Dinner',
-                'mood_tags': 'rich, aromatic, indulgent, warming',
-                'description': 'A rich, aromatic lamb curry with a smooth, creamy texture, made with yogurt, spices, onions, and tomatoes. A popular dish for special occasions and celebrations.'
-            },
+            
             {
                 'name': 'Rajma Chawal',
                 'ingredients': 'Kidney beans, rice, tomatoes, spices',
@@ -171,14 +150,7 @@ class Command(BaseCommand):
                 'mood_tags': 'spicy, flavorful, indulgent, exciting',
                 'description': 'A spicy and flavorful dish of cauliflower florets coated in a thick, tangy sauce made with soy sauce, garlic, and ginger. A popular choice for a hearty dinner or snack.'
             },
-            {
-                'name': 'Dim Sum',
-                'ingredients': 'Flour, vegetables, meat, soy sauce',
-                'region': 'Chinese',
-                'meal_time': 'Lunch',
-                'mood_tags': 'delicate, social, light, fun',
-                'description': 'Delicate, bite-sized steamed dumplings filled with a mix of vegetables, meat, and soy sauce. A popular choice for a social lunch or snack.'
-            },
+           
             {
                 'name': 'Spring Rolls',
                 'ingredients': 'Flour wrappers, mixed vegetables, soy sauce, oil',
@@ -384,7 +356,68 @@ class Command(BaseCommand):
                 'meal_time': 'Snack',
                 'mood_tags': 'crispy, spicy, street food, filling',
                 'description': 'Crispy potato patties spiced with Indian masalas, shallow-fried and served hot with chutneys. A favorite street food snack across India.'
-            }
+            },
+            # Additional South Indian Full Meals
+            {
+                'name': 'Meals (Thali)',
+                'ingredients': 'Rice, sambar, rasam, curries, papad, pickle, buttermilk',
+                'region': 'South Indian',
+                'meal_time': 'Lunch',
+                'mood_tags': 'complete, traditional, wholesome, satisfying',
+                'description': 'A complete South Indian meal served on a banana leaf with rice, sambar, rasam, various curries, papad, pickle, and buttermilk. A traditional and wholesome dining experience.'
+            },
+            {
+                'name': 'Kerala Parotta with Curry',
+                'ingredients': 'Maida, eggs, curry leaves, chicken/vegetable curry',
+                'region': 'South Indian',
+                'meal_time': 'Dinner',
+                'mood_tags': 'layered, flaky, filling, street food',
+                'description': 'Flaky, layered flatbread made from maida, served with a spicy curry. A popular street food that has become a staple in Kerala cuisine.'
+            },
+            # Additional North Indian Full Meals
+            {
+                'name': 'Thali',
+                'ingredients': 'Roti, rice, dal, sabzi, raita, papad, pickle',
+                'region': 'North Indian',
+                'meal_time': 'Lunch',
+                'mood_tags': 'complete, traditional, wholesome, satisfying',
+                'description': 'A complete North Indian meal with roti, rice, dal, vegetable curry, raita, papad, and pickle. A traditional and wholesome dining experience.'
+            },
+        
+            # Additional Chinese Full Meals
+            {
+                'name': 'Fried Rice with Gravy',
+                'ingredients': 'Rice, vegetables, soy sauce, garlic, ginger, gravy',
+                'region': 'Chinese',
+                'meal_time': 'Lunch',
+                'mood_tags': 'filling, flavorful, quick, satisfying',
+                'description': 'Flavorful fried rice served with a choice of vegetable or non-vegetable gravy. A complete meal that is both satisfying and quick to prepare.'
+            },
+            {
+                'name': 'Hakka Noodles with Gravy',
+                'ingredients': 'Noodles, vegetables, soy sauce, garlic, ginger, gravy',
+                'region': 'Chinese',
+                'meal_time': 'Dinner',
+                'mood_tags': 'spicy, filling, flavorful, satisfying',
+                'description': 'Stir-fried Hakka noodles served with a choice of vegetable or non-vegetable gravy. A popular Indo-Chinese dish that makes for a complete meal.'
+            },
+            # Additional Fast Food Full Meals
+            {
+                'name': 'Burger Meal',
+                'ingredients': 'Burger, French fries, soft drink',
+                'region': 'Fast Food',
+                'meal_time': 'Lunch',
+                'mood_tags': 'quick, filling, casual, satisfying',
+                'description': 'A complete meal consisting of a burger, French fries, and a soft drink. Perfect for a quick and satisfying lunch.'
+            },
+            {
+                'name': 'Pizza',
+                'ingredients': 'Pizza, garlic bread, soft drink',
+                'region': 'Fast Food',
+                'meal_time': 'Dinner',
+                'mood_tags': 'sharing, casual, indulgent, satisfying',
+                'description': 'A complete meal with a pizza, garlic bread, and a soft drink. Great for sharing or enjoying a casual dinner.'
+            },
         ]
 
         # Clear existing food items

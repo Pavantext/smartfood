@@ -30,68 +30,68 @@ def get_conversation_context(conversation, limit=5):
 
 def get_recommendation(user_input, conversation=None):
     try:
-        # Context history
+        # 1. Load context if any
         context = get_conversation_context(conversation) if conversation else ""
         context_block = f"Previous conversation:\n{context}\n\n" if context else ""
 
-        # Prepare food item descriptions
+        # 2. Get food items from DB
         food_items = list(FoodItem.objects.all())
         if not food_items:
-            return "I don't have any food options yet to recommend. Please add some to the menu first."
+            return "Oops! I don't have any food items yet. Please add some delicious dishes first."
 
-        food_descriptions = []
-        for idx, food in enumerate(food_items, 1):
-            desc = (
-                f"{idx}. {food.name} - Ingredients: {food.ingredients}. "
-                f"Meal time: {food.meal_time}. Mood tags: {food.mood_tags}. "
-                f"{food.description if hasattr(food, 'description') else ''}"
-            )
-            food_descriptions.append(desc)
+        # 3. Compute embeddings for user input and food descriptions
+        query_vector = embedding_model.encode(user_input)
+        food_vectors = []
+        for food in food_items:
+            text = f"{food.name}, {food.ingredients}, {food.description}, {food.meal_time}, {food.mood_tags}"
+            food_vectors.append(embedding_model.encode(text))
+        food_vectors = np.array(food_vectors)
 
-        food_list_str = "\n".join(food_descriptions)
+        # 4. Find the most relevant food item
+        scores = cosine_similarity([query_vector], food_vectors)[0]
+        best_index = int(np.argmax(scores))
+        best_food = food_items[best_index]
 
-        # Gemini: Analyze the input and suggest the best food (semantic reasoning)
-        gemini = genai.GenerativeModel(model_name="tunedModels/south-indian-food-bot-8901")
-        prompt = f"""
-You are a smart, friendly, and highly intuitive food assistant designed to give personalized dish recommendations.
+        # 5. Friendly final response generation using Gemini
+        gemini = genai.GenerativeModel(model_name="gemini-2.0-flash")
 
-You will be provided with:
-1. A list of available food items in JSON format.
-2. The user's input, which may include preferences, mood, cravings, time of day, or even weather conditions.
+        final_prompt = f"""
+You are a warm, smart, and cheerful food assistant.
 
-Each food item includes:
-- Name
-- Ingredients
-- Region
-- Meal time (e.g., Breakfast, Lunch, Dinner, Starter)
-- Mood tags (e.g., comforting, spicy, refreshing)
-- Description
+You’ve already matched the best food item for the user from a curated database using semantic search.
 
-### Your task:
-Analyze the user's input carefully and match it to **one** most appropriate food item from the list.
+Your task now is to explain **why** the chosen dish is a great fit for the user’s input and present it in a friendly, natural-sounding tone.
 
-Consider the following when making a recommendation:
-- Current weather or temperature context (e.g., hot/cold day)
-- Whether the user wants a drink or food
-- The user's mood or emotional state (e.g., happy, tired, sad)
-- Cravings or ingredient mentions (e.g., "I want something spicy")
-- Time of day (e.g., lunch, dinner, snack)
-- Regional preference if mentioned
+Be brief, joyful, and personal.
 
-### Output Format:
-Respond in the following format:
-1. **Food Name**: <name>
-2. **Reason**: Explain why this food is the best match based on user input and food details.
-3. **Suggestion**: A friendly and engaging sentence suggesting the dish (as if you're talking to the user directly).
-
-### Available Food Items:
-{food_list_str}
+### Context (if any):
+{context_block}
 
 ### User Input:
 "{user_input}"
 
-Your response:
+### Matched Food Item:
+- **Name**: {best_food.name}
+- **Ingredients**: {best_food.ingredients}
+- **Meal Time**: {best_food.meal_time}
+- **Mood Tags**: {best_food.mood_tags}
+- **Description**: {best_food.description}
+
+### Write a response that:
+- Acknowledges the user's mood or craving.
+- Explains why this food suits them.
+- Mentions 1-2 interesting ingredients or features.
+- Ends with a question or offer to suggest something else.
+
+Response:
 """
+
+        final_response = gemini.generate_content(final_prompt).text.strip()
+        return final_response
+
+    except Exception as e:
+        return f"Sorry, something went wrong while thinking about that. Can you try rephrasing it? (Error: {str(e)})"
+
 
 
         gemini_response = gemini.generate_content(prompt).text.strip()
