@@ -16,6 +16,16 @@ services:
         value: false
       - key: ALLOWED_HOSTS
         value: .onrender.com
+    plan: free
+    buildFilter:
+      paths:
+        - package.json
+        - requirements.txt
+        - render.yaml
+    healthCheckPath: /
+    autoDeploy: true
+    buildTimeout: 1800
+    memory: 512
 
 databases:
   - name: smartfood-db
